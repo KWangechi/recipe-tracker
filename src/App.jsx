@@ -1,10 +1,61 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import CreateRecipeModal from "./components/CreateRecipeModal";
-import { recipeCategories, recipes } from "./store/useRecipeStore";
+import {
+  featuredRecipe,
+  fetchAllRecipes,
+  filterRecipes,
+  recipeCategories,
+  searchRecipes,
+} from "./store/useRecipeStore";
 
 function App() {
-  const [open, setOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredRecipes, setFilteredRecipes] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+
+  function handleOpenCreateModal() {
+    setModalOpen(true);
+  }
+
+  function clearSearch() {
+    console.log("clear the search Term");
+    setSearchTerm("");
+  }
+
+  // Fetch recipes from local storage when the component is mounted
+  useEffect(() => {
+    setFilteredRecipes(fetchAllRecipes);
+  }, []);
+
+  // Filter recipes based on the search term
+  useEffect(() => {
+    setFilteredRecipes(searchRecipes(searchTerm));
+  }, [searchTerm]);
+
+  // Filter recipes based on the category filter
+  useEffect(() => {
+    setFilteredRecipes(filterRecipes(fetchAllRecipes(), selectedCategories));
+  }, [selectedCategories]);
+
+  // Filter recipes based on the date range filter
+  // useEffect(() => {
+  //   if (recipeCategories.length > 0) {
+  //     const filteredByDate = filteredRecipes.filter((recipe) => {
+  //       const recipeDate = new Date(recipe.date);
+  //       const startDate = new Date(recipe.dateRange.start);
+  //       const endDate = new Date(recipe.dateRange.end);
+  //       return (
+  //         recipeDate >= startDate &&
+  //         recipeDate <= endDate &&
+  //         recipeCategories.includes(recipe.category)
+  //       );
+  //     });
+  //     setFilteredRecipes(filteredByDate);
+  //   }
+  // }, [recipeCategories, filteredRecipes]);
+
   return (
     <>
       <div className="rounded-lg w-1/2 my-5 mx-auto text-black p-8 shadow-lg">
@@ -13,7 +64,6 @@ function App() {
             What would you like to cook today?
           </h1>
         </div>
-
         <div className="flex items-center rounded-md bg-white pl-3 outline outline-1 -outline-offset-1 outline-gray-300 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-indigo-600 mt-5">
           <div className="shrink-0 select-none text-base text-gray-500 sm:text-sm/6">
             <svg
@@ -35,26 +85,103 @@ function App() {
             id="search"
             name="search"
             type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search any recipes"
             className="block min-w-0 grow pl-1 pr-3 text-base text-gray-900 placeholder:text-gray-400 focus:outline focus:outline-0 sm:text-sm/6 rounded-xl py-2"
           />
-          <div className="grid shrink-0 grid-cols-1 focus-within:relative"></div>
+          {searchTerm ? (
+            <div
+              className="grid shrink-0 grid-cols-1 focus-within:relative mr-4 cursor-pointer"
+              onClick={clearSearch}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="size-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                />
+              </svg>
+            </div>
+          ) : null}
+        </div>
+        {/* Featured Recipe */}
+        <div className="mt-4">
+          <h2 className="text-xl font-bold text-center mb-4">
+            Featured Recipe
+          </h2>
+          <div className="relative rounded-xl overflow-hidden shadow-lg bg-gradient-to-r from-green-600 to-grey-200 text-white p-6">
+            {/* Image */}
+            <img
+              src={featuredRecipe?.imageUrl} // Replace with your recipe image
+              alt="Featured Recipe"
+              className="object-cover  rounded-lg"
+            />
+
+            {/* Text Content */}
+            <div className="mt-4">
+              <h3 className="text-2xl font-bold">{featuredRecipe?.name}</h3>
+              <p className="text-sm mt-2 text-gray-200">
+                {featuredRecipe?.description}
+              </p>
+            </div>
+
+            {/* Action Button */}
+            <div className="mt-4 flex justify-center">
+              <button className="bg-yellow-400 text-black px-6 py-2 font-bold rounded-full shadow-md hover:bg-yellow-300 focus:ring-2 focus:ring-yellow-500">
+                View Recipe
+              </button>
+            </div>
+          </div>
         </div>
 
+        {/* Categories */}
         <div className="mt-6">
           <div className="flex justify-between align-middle">
             <div className="font-bold text-xl">Categories</div>
             <div className="">
-              <span className="text-green-400 text-lg font-bold">See All</span>
+              <span
+                className="text-green-400 text-md font-semibold cursor-pointer italic"
+                onClick={() => setSelectedCategories([])}
+              >
+                Clear All
+              </span>
             </div>
           </div>
 
-          <div className="mt-4 flex justify-between overflow-x-auto">
+          <div className="grid lg:grid-cols-5 sm:grid-cols-3 overflow-x-auto my-2 py-4 gap-x-4">
             {recipeCategories.map((category, index) => {
               return (
                 <div
                   key={index}
-                  className="flex items-center px-3 py-2 rounded-xl shadow-2xl shadow-green-300 bg-green-500 text-white font-bold"
+                  className={`flex items-center px-4 py-3 rounded-xl shadow-2xl font-bold cursor-pointer
+                    ${
+                      selectedCategories.includes(category.name)
+                        ? "bg-green-600 text-white"
+                        : "bg-white text-black"
+                    }`}
+                  onClick={() => {
+                    if (selectedCategories.includes(category.name)) {
+                      setSelectedCategories(
+                        selectedCategories.filter(
+                          (selectedCategory) =>
+                            selectedCategory !== category.name
+                        )
+                      );
+                    } else {
+                      setSelectedCategories([
+                        ...selectedCategories,
+                        category.name,
+                      ]);
+                    }
+                  }}
                 >
                   <img
                     src={category.icon}
@@ -71,37 +198,37 @@ function App() {
           </div>
         </div>
 
-        <div className="mt-6">
+        {/* Recipes */}
+        <div className="mt-12">
           <div className="flex justify-between align-middle">
             <span className="font-bold text-xl">Recipes</span>
             <div className="">
               <span
                 className="text-green-400 text-lg font-bold cursor-pointer"
-                onClick={() => {
-                  return <CreateRecipeModal setOpen={() => setOpen(!open)} />;
-                }}
+                onClick={handleOpenCreateModal}
               >
                 Add Recipe
               </span>
             </div>
           </div>
 
-          <div className="mt-4 flex justify-between overflow-x-auto">
-            {recipes.map((recipe, index) => {
+          <CreateRecipeModal setOpen={setModalOpen} open={modalOpen} />
+
+          <div className="my-4 grid lg:grid-cols-4 sm:grid-cols-2 overflow-x-auto p-4 gap-y-6 gap-x-4">
+            {filteredRecipes.map((recipe, index) => {
               return (
                 <div
                   key={index}
-                  className="flex items-center px-3 py-2 rounded-xl shadow-2xl shadow-green-300 bg-green-500 text-white font-bold"
+                  className="flex-col justify-items-center items-center align-middle px-5 py-2 rounded-xl text-black font-bold w-fit h-auto"
                 >
                   <img
-                    src={recipe.image}
-                    alt={recipe.image}
-                    width={"20px"}
-                    height="20px"
+                    src={recipe.imageUrl}
+                    alt="Recipe Photo"
+                    className="rounded-lg"
                   />
-                  <span className="ml-2 text-md text-center">
+                  <p className="ml-2 text-md text-center italic font-semibold w-auto h-1/2">
                     {recipe.name}
-                  </span>
+                  </p>
                 </div>
               );
             })}
