@@ -40,7 +40,8 @@ export default function CreateRecipeModal({ open, setOpen }) {
 
     alert("Success!");
 
-    // setRecipe(null);
+    setPhotoUrl(null);
+    setOpen(false);
   };
 
   return (

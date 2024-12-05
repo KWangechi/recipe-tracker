@@ -77,10 +77,11 @@ export const filterRecipes = (recipes, selectedCategories) => {
 };
 
 export function addRecipe(newRecipe) {
-  console.log(newRecipe);
+  const newRecipes = [];
   recipe = { id, ...newRecipe };
-  recipes.push(recipe);
-  localStorage.setItem("recipes", JSON.stringify(recipes));
+  newRecipes.push(recipe);
+  fetchAllRecipes();
+  localStorage.setItem("recipes", JSON.stringify([...recipes, ...newRecipes]));
 }
 
 export function fetchAllRecipes() {
@@ -88,7 +89,6 @@ export function fetchAllRecipes() {
 
   // randomly select an recipe and set it as featureRecipe
   featuredRecipe = recipes[Math.floor(Math.random() * recipes.length)] || {};
-  console.log("Get All recipes", recipes);
   return recipes;
 }
 
