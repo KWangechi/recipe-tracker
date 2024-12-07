@@ -1,8 +1,11 @@
 export let recipe = {};
 export let recipes = [];
-export let featuredRecipe = {};
+export let featuredRecipe =
+  recipes?.[Math.floor(Math.random() * recipes?.length)] || {};
 
-const id = crypto.randomUUID();
+let successMessage,
+  errorMessages = "";
+
 export const recipeCategories = [
   {
     name: "dessert",
@@ -53,17 +56,20 @@ export function processImageUploaded(recipeImage) {
 
 export function searchRecipes(search) {
   fetchAllRecipes();
-  const filteredRecipes = search
-    ? recipes.filter((recipe) => {
-        return Object.values(recipe).some(
-          (value) =>
-            typeof value !== "object" &&
-            String(value).toLowerCase().includes(search.toLowerCase())
-        );
-      })
-    : [...recipes];
-  recipes = [...filteredRecipes];
-  return recipes;
+
+  if (recipes?.length) {
+    const filteredRecipes = search
+      ? recipes?.filter((recipe) => {
+          return Object.values(recipe).some(
+            (value) =>
+              typeof value !== "object" &&
+              String(value).toLowerCase().includes(search.toLowerCase())
+          );
+        })
+      : [...recipes];
+    recipes = [...filteredRecipes];
+    return recipes;
+  }
 }
 
 export const filterRecipes = (recipes, selectedCategory) => {
@@ -77,18 +83,30 @@ export const filterRecipes = (recipes, selectedCategory) => {
 };
 
 export function addRecipe(newRecipe) {
+  const id = crypto.randomUUID();
+
+  fetchAllRecipes();
   const newRecipes = [];
+  console.log(id);
   recipe = { id, ...newRecipe };
   newRecipes.push(recipe);
+  localStorage.setItem(
+    "recipes",
+    recipes?.length
+      ? JSON.stringify([...recipes, ...newRecipes])
+      : JSON.stringify([...newRecipes])
+  );
+
   fetchAllRecipes();
-  localStorage.setItem("recipes", JSON.stringify([...recipes, ...newRecipes]));
+
+  successMessage = "Recipe Added!";
 }
 
 export function fetchAllRecipes() {
   recipes = JSON.parse(localStorage.getItem("recipes"));
 
   // randomly select an recipe and set it as featureRecipe
-  featuredRecipe = recipes[Math.floor(Math.random() * recipes.length)] || {};
+  featuredRecipe = recipes?.[Math.floor(Math.random() * recipes?.length)] || {};
   return recipes;
 }
 
@@ -104,11 +122,18 @@ export function updateRecipe(recipeId, updatedRecipe) {
   let existingRecipe = recipes.find((recipe) => recipe?.id === recipeId);
 
   if (existingRecipe) {
-    Object.assign(existingRecipe, updatedRecipe);
+    recipes[recipes.indexOf(existingRecipe)] = {
+      recipeId,
+      ...updatedRecipe,
+    };
+
+    console.log(recipes);
+
     localStorage.setItem("recipes", JSON.stringify(recipes));
+    successMessage = "Recipe Updated!";
   }
 
-  return existingRecipe;
+  return updatedRecipe;
 }
 
 export function deleteRecipe(recipeId) {
@@ -118,7 +143,8 @@ export function deleteRecipe(recipeId) {
 
   if (index > 0) {
     recipes.splice(index, 1);
-    localStorage.setItem("recipes", JSON.stringify(recipes));
+    console.log(recipes);
+    localStorage.setItem("recipes", JSON.stringify([...recipes]));
     fetchAllRecipes();
   }
 }

@@ -7,19 +7,22 @@ import {
   addRecipe,
   processImageUploaded,
   recipeCategories,
+  updateRecipe,
 } from "../store/useRecipeStore";
 
-export default function CreateRecipeModal({ open, setOpen }) {
+export default function CreateRecipeModal({ open, setOpen, selectedRecipe }) {
   const [photoUrl, setPhotoUrl] = useState(null);
+
+  const editMode = !!selectedRecipe;
   //   const [open, setOpen] = useState(true);
   const [recipe, setRecipe] = useState({
-    name: "",
-    description: "",
-    category: "",
-    ingredients: [],
-    instructions: [],
-    file: null,
-    imageUrl: "",
+    name: editMode ? selectedRecipe?.name : "",
+    description: editMode ? selectedRecipe?.description : "",
+    category: editMode ? selectedRecipe?.category : "",
+    ingredients: editMode ? selectedRecipe?.ingredients : [],
+    instructions: editMode ? selectedRecipe?.instructions : [],
+    file: editMode ? selectedRecipe?.file : null,
+    imageUrl: editMode ? selectedRecipe?.imageUrl : "",
   });
 
   const handlePhotoUploaded = async (e) => {
@@ -36,7 +39,11 @@ export default function CreateRecipeModal({ open, setOpen }) {
   };
 
   const handleAddRecipe = () => {
-    addRecipe(recipe);
+    if (editMode) {
+      updateRecipe(selectedRecipe?.id, recipe);
+    } else {
+      addRecipe(recipe);
+    }
 
     alert("Success!");
 
@@ -73,6 +80,7 @@ export default function CreateRecipeModal({ open, setOpen }) {
                       <input
                         id="recipename"
                         name="recipename"
+                        defaultValue={selectedRecipe?.name}
                         type="text"
                         placeholder="Tomato Salad"
                         className="block min-w-0 grow py-1.5 pl-1 pr-3 text-base text-gray-900 placeholder:text-gray-400 focus:outline focus:outline-0 sm:text-sm/6 h-10"
@@ -102,6 +110,7 @@ export default function CreateRecipeModal({ open, setOpen }) {
                       onChange={(e) =>
                         setRecipe({ ...recipe, category: e.target.value })
                       }
+                      defaultValue={selectedRecipe?.category}
                     >
                       {recipeCategories.map((category) => {
                         return (
@@ -132,11 +141,11 @@ export default function CreateRecipeModal({ open, setOpen }) {
                       name="description"
                       rows={2}
                       className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                      defaultValue={""}
+                      defaultValue={selectedRecipe?.description}
                       onChange={(e) =>
                         setRecipe({
                           ...recipe,
-                          description: e.target.value.split("\n"),
+                          description: e.target.value,
                         })
                       }
                     />
@@ -157,7 +166,7 @@ export default function CreateRecipeModal({ open, setOpen }) {
                       name="instructions"
                       rows={4}
                       className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                      defaultValue={""}
+                      defaultValue={selectedRecipe?.instructions}
                       onChange={(e) =>
                         setRecipe({
                           ...recipe,
@@ -183,10 +192,13 @@ export default function CreateRecipeModal({ open, setOpen }) {
                       name="ingredients"
                       rows={4}
                       className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                      defaultValue={""}
+                      defaultValue={selectedRecipe?.ingredients}
                       required
                       onChange={(e) => {
-                        setRecipe({ ...recipe, ingredients: e.target.value });
+                        setRecipe({
+                          ...recipe,
+                          ingredients: e.target.value.split("\n"),
+                        });
                       }}
                     />
                   </div>
@@ -202,9 +214,9 @@ export default function CreateRecipeModal({ open, setOpen }) {
                   </label>
                   <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
                     <div className="text-center">
-                      {photoUrl ? (
+                      {photoUrl || editMode ? (
                         <img
-                          src={photoUrl}
+                          src={!editMode ? photoUrl : selectedRecipe?.imageUrl}
                           width="100%"
                           height="auto"
                           className="rounded-lg h-56"
@@ -225,6 +237,7 @@ export default function CreateRecipeModal({ open, setOpen }) {
                             id="file-upload"
                             name="file-upload"
                             type="file"
+                            // value={selectedRecipe?.file}
                             className="sr-only"
                             onChange={(e) => handlePhotoUploaded(e)}
                           />
@@ -245,9 +258,9 @@ export default function CreateRecipeModal({ open, setOpen }) {
               <button
                 type="button"
                 onClick={handleAddRecipe}
-                className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
+                className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
               >
-                Save
+                {editMode ? "Save Changes" : "Submit"}
               </button>
               <button
                 type="button"

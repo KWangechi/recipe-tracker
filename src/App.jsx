@@ -79,7 +79,7 @@ function App() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search any recipes"
+              placeholder="Search for recipes"
               className="block min-w-0 grow pl-1 pr-3 text-base text-gray-900 placeholder:text-gray-400 focus:outline focus:outline-0 sm:text-sm/6 rounded-xl py-2"
             />
             {searchTerm ? (
@@ -114,14 +114,16 @@ function App() {
               <img
                 src={featuredRecipe?.imageUrl} // Replace with your recipe image
                 alt="Featured Recipe"
-                className="object-cover  rounded-lg"
+                className="object-cover rounded-lg"
+                width={'100px'}
               />
 
               {/* Text Content */}
               <div className="mt-4">
                 <h3 className="text-2xl font-bold">{featuredRecipe?.name}</h3>
                 <p className="text-sm mt-2 text-gray-200">
-                  {featuredRecipe?.description}
+                  {featuredRecipe?.description ||
+                    "Discover this amazing recipe"}
                 </p>
               </div>
 
@@ -194,8 +196,8 @@ function App() {
 
             <CreateRecipeModal setOpen={setModalOpen} open={modalOpen} />
 
-            <div className="my-4 grid lg:grid-cols-4 sm:grid-cols-2 overflow-x-auto p-4 gap-y-6 gap-x-4">
-              {filteredRecipes.map((recipe, index) => {
+            <div className="my-4 grid lg:grid-cols-4 sm:grid-cols-2 p-4 gap-y-6 gap-x-4">
+              {filteredRecipes?.map((recipe, index) => {
                 return (
                   <div
                     key={index}
