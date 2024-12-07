@@ -14,7 +14,7 @@ function App() {
   const [modalOpen, setModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredRecipes, setFilteredRecipes] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState();
   const [viewRecipe, setViewRecipe] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState({});
 
@@ -38,8 +38,8 @@ function App() {
 
   // Filter recipes based on the category filter
   useEffect(() => {
-    setFilteredRecipes(filterRecipes(fetchAllRecipes(), selectedCategories));
-  }, [selectedCategories]);
+    setFilteredRecipes(filterRecipes(fetchAllRecipes(), selectedCategory));
+  }, [selectedCategory]);
 
   return (
     <>
@@ -141,7 +141,7 @@ function App() {
               <div className="">
                 <span
                   className="text-green-400 text-md font-semibold cursor-pointer italic"
-                  onClick={() => setSelectedCategories([])}
+                  onClick={() => setSelectedCategory(null)}
                 >
                   Clear All
                 </span>
@@ -155,24 +155,12 @@ function App() {
                     key={index}
                     className={`flex items-center px-4 py-3 rounded-xl shadow-2xl font-bold cursor-pointer
                     ${
-                      selectedCategories.includes(category.name)
+                      selectedCategory === category.name
                         ? "bg-green-600 text-white"
                         : "bg-white text-black"
                     }`}
                     onClick={() => {
-                      if (selectedCategories.includes(category.name)) {
-                        setSelectedCategories(
-                          selectedCategories.filter(
-                            (selectedCategory) =>
-                              selectedCategory !== category.name
-                          )
-                        );
-                      } else {
-                        setSelectedCategories([
-                          ...selectedCategories,
-                          category.name,
-                        ]);
-                      }
+                      setSelectedCategory(category.name);
                     }}
                   >
                     <img

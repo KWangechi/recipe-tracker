@@ -13,7 +13,6 @@ export default function ViewRecipe({
 
   const handleOpenModal = () => {
     setModalOpen(true);
-    // setSelectedRecipe(selectedRecipe);
   };
 
   return (

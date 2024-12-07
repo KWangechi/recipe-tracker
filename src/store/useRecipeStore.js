@@ -66,13 +66,13 @@ export function searchRecipes(search) {
   return recipes;
 }
 
-export const filterRecipes = (recipes, selectedCategories) => {
-  if (!selectedCategories.length) {
+export const filterRecipes = (recipes, selectedCategory) => {
+  if (!selectedCategory) {
     return recipes;
   }
 
   return recipes.filter((recipe) => {
-    return selectedCategories.includes(recipe.category);
+    return recipe.category === selectedCategory;
   });
 };
 
