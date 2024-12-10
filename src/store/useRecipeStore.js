@@ -88,8 +88,8 @@ export function addRecipe(newRecipe) {
   fetchAllRecipes();
   const newRecipes = [];
   console.log(id);
-  recipe = { id, ...newRecipe };
-  newRecipes.push(recipe);
+  // recipe = { id, ...newRecipe };
+  newRecipes.push({ id, ...newRecipe });
   localStorage.setItem(
     "recipes",
     recipes?.length
@@ -123,14 +123,13 @@ export function updateRecipe(recipeId, updatedRecipe) {
 
   if (existingRecipe) {
     recipes[recipes.indexOf(existingRecipe)] = {
-      recipeId,
+      id: recipeId,
       ...updatedRecipe,
     };
 
-    console.log(recipes);
-
     localStorage.setItem("recipes", JSON.stringify(recipes));
     successMessage = "Recipe Updated!";
+    fetchAllRecipes();
   }
 
   return updatedRecipe;
@@ -145,6 +144,5 @@ export function deleteRecipe(recipeId) {
     recipes.splice(index, 1);
     console.log(recipes);
     localStorage.setItem("recipes", JSON.stringify([...recipes]));
-    fetchAllRecipes();
   }
 }

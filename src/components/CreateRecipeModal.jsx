@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
 // import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { PhotoIcon } from "@heroicons/react/24/solid";
@@ -22,12 +22,17 @@ export default function CreateRecipeModal({ open, setOpen, selectedRecipe }) {
     ingredients: editMode ? selectedRecipe?.ingredients : [],
     instructions: editMode ? selectedRecipe?.instructions : [],
     file: editMode ? selectedRecipe?.file : null,
-    imageUrl: editMode ? selectedRecipe?.imageUrl : "",
+    imageUrl: editMode ? selectedRecipe?.imageUrl : photoUrl,
   });
+
+  useEffect(() => {
+    setPhotoUrl(selectedRecipe?.imageUrl);
+  }, [selectedRecipe?.imageUrl]);
 
   const handlePhotoUploaded = async (e) => {
     const file = e.target.files[0];
     let imageUrl = "";
+
     if (file) {
       imageUrl = await processImageUploaded(file);
       setPhotoUrl(imageUrl);
@@ -63,7 +68,9 @@ export default function CreateRecipeModal({ open, setOpen, selectedRecipe }) {
             className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full sm:max-w-lg data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95"
           >
             <form action="" className="p-4">
-              <h2 className="font-bold">Add a Recipe</h2>
+              <h2 className="font-bold">
+                {editMode ? `Edit ${selectedRecipe?.name}` : "Add A Recipe"}
+              </h2>
               <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                 {/* Recipe Name */}
                 <div className="sm:col-span-6">
@@ -212,9 +219,9 @@ export default function CreateRecipeModal({ open, setOpen, selectedRecipe }) {
                   </label>
                   <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
                     <div className="text-center">
-                      {photoUrl || editMode ? (
+                      {photoUrl ? (
                         <img
-                          src={!editMode ? photoUrl : selectedRecipe?.imageUrl}
+                          src={photoUrl || selectedRecipe?.imageUrl}
                           width="100%"
                           height="auto"
                           className="rounded-lg h-56"
@@ -235,7 +242,6 @@ export default function CreateRecipeModal({ open, setOpen, selectedRecipe }) {
                             id="file-upload"
                             name="file-upload"
                             type="file"
-                            // value={selectedRecipe?.file}
                             className="sr-only"
                             onChange={(e) => handlePhotoUploaded(e)}
                           />

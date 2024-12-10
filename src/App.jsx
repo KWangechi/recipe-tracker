@@ -18,6 +18,11 @@ function App() {
   const [viewRecipe, setViewRecipe] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState({});
 
+  const handleCopyToClipboard = () => {
+    navigator.clipboard.writeText(JSON.stringify(filteredRecipes));
+    alert("Instructions copied to clipboard!");
+  };
+
   function handleOpenCreateModal() {
     setModalOpen(true);
   }
@@ -28,8 +33,10 @@ function App() {
 
   // Fetch recipes from local storage when the component is mounted
   useEffect(() => {
-    setFilteredRecipes(fetchAllRecipes());
-  }, []);
+    if (!viewRecipe) {
+      setFilteredRecipes(fetchAllRecipes());
+    }
+  }, [viewRecipe]);
 
   // Filter recipes based on the search term
   useEffect(() => {
@@ -50,14 +57,17 @@ function App() {
           setViewRecipe={setViewRecipe}
         />
       ) : (
-        <div className="rounded-lg w-1/2 my-5 mx-auto text-black p-8 shadow-lg sm:w-full">
-          <div className="flex justify-between">
-            <h1 className="text-2xl text-center font-bold text-wrap">
+        <div className="rounded-lg my-5 mx-auto text-black p-8 shadow-lg max-w-screen-lg">
+          {/* Title Section */}
+          <div className="flex justify-center">
+            <h1 className="text-2xl text-center font-bold">
               What would you like to cook today?
             </h1>
           </div>
-          <div className="flex items-center rounded-md bg-white pl-3 outline outline-1 -outline-offset-1 outline-gray-300 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-indigo-600 mt-5">
-            <div className="shrink-0 select-none text-base text-gray-500 sm:text-sm/6">
+
+          {/* Search Input Section */}
+          <div className="flex items-center rounded-md bg-white pl-3 outline outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 mt-5">
+            <div className="shrink-0 select-none text-base text-gray-500 sm:text-sm">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -80,9 +90,9 @@ function App() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search for recipes"
-              className="block min-w-0 grow pl-1 pr-3 text-base text-gray-900 placeholder:text-gray-400 focus:outline focus:outline-0 sm:text-sm/6 rounded-xl py-2"
+              className="block min-w-0 grow pl-1 pr-3 text-base text-gray-900 placeholder:text-gray-400 focus:outline-0 sm:text-sm rounded-xl py-2"
             />
-            {searchTerm ? (
+            {searchTerm && (
               <div
                 className="grid shrink-0 grid-cols-1 focus-within:relative mr-4 cursor-pointer"
                 onClick={clearSearch}
@@ -102,23 +112,20 @@ function App() {
                   />
                 </svg>
               </div>
-            ) : null}
+            )}
           </div>
-          {/* Featured Recipe */}
+
+          {/* Featured Recipe Section */}
           <div className="mt-4">
             <h2 className="text-xl font-bold text-center mb-4">
               Featured Recipe
             </h2>
-            <div className="relative rounded-xl overflow-hidden shadow-lg bg-gradient-to-r from-green-600 to-grey-200 text-white p-6">
-              {/* Image */}
+            <div className="relative rounded-xl overflow-hidden shadow-lg bg-gradient-to-r from-green-600 to-gray-200 text-white p-6">
               <img
-                src={featuredRecipe?.imageUrl} // Replace with your recipe image
+                src={featuredRecipe?.imageUrl}
                 alt="Featured Recipe"
-                className="object-cover rounded-lg"
-                width={'100px'}
+                className="object-cover rounded-lg w-full h-48 sm:h-56 md:h-64"
               />
-
-              {/* Text Content */}
               <div className="mt-4">
                 <h3 className="text-2xl font-bold">{featuredRecipe?.name}</h3>
                 <p className="text-sm mt-2 text-gray-200">
@@ -126,49 +133,45 @@ function App() {
                     "Discover this amazing recipe"}
                 </p>
               </div>
-
-              {/* Action Button */}
               <div className="mt-4 flex justify-center">
-                <button className="bg-yellow-400 text-black px-6 py-2 font-bold rounded-full shadow-md hover:bg-yellow-300 focus:ring-2 focus:ring-yellow-500">
+                <button className="bg-yellow-400 text-black px-6 py-2 font-bold rounded-full shadow-md hover:bg-yellow-300 focus:ring-2 focus:ring-yellow-500" onClick={() => {
+                  setSelectedRecipe(featuredRecipe)
+                  setViewRecipe(true)
+                }}>
                   View Recipe
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Categories */}
+          {/* Categories Section */}
           <div className="mt-6">
-            <div className="flex justify-between align-middle">
+            <div className="flex justify-between items-center">
               <div className="font-bold text-xl">Categories</div>
-              <div className="">
-                <span
-                  className="text-green-400 text-md font-semibold cursor-pointer italic"
-                  onClick={() => setSelectedCategory(null)}
-                >
-                  Clear All
-                </span>
-              </div>
+              <span
+                className="text-green-400 text-md font-semibold cursor-pointer italic"
+                onClick={() => setSelectedCategory(null)}
+              >
+                Clear All
+              </span>
             </div>
-
-            <div className="grid lg:grid-cols-5 sm:grid-cols-3 overflow-x-auto my-2 py-4 gap-x-4">
+            <div className="flex justify-between overflow-x-auto mt-4 gap-6">
               {recipeCategories.map((category, index) => {
                 return (
                   <div
                     key={index}
                     className={`flex items-center px-4 py-3 rounded-xl shadow-2xl font-bold cursor-pointer
-                    ${
-                      selectedCategory === category.name
-                        ? "bg-green-600 text-white"
-                        : "bg-white text-black"
-                    }`}
-                    onClick={() => {
-                      setSelectedCategory(category.name);
-                    }}
+            ${
+              selectedCategory === category.name
+                ? "bg-green-600 text-white"
+                : "bg-white text-black"
+            }`}
+                    onClick={() => setSelectedCategory(category.name)}
                   >
                     <img
                       src={category.icon}
-                      alt={category.icon}
-                      width={"20px"}
+                      alt={category.label}
+                      width="20px"
                       height="20px"
                     />
                     <span className="ml-2 text-md text-center">
@@ -180,28 +183,53 @@ function App() {
             </div>
           </div>
 
-          {/* Recipes */}
+          {/* Recipes Section */}
           <div className="mt-12">
-            <div className="flex justify-between align-middle">
-              <span className="font-bold text-xl">Recipes</span>
-              <div className="">
+            <div className="flex items-center justify-between">
+              <div className="flex justify-start">
+                <span className="font-bold text-xl">Recipes</span>
+              </div>
+
+              <div className="flex justify-end gap-4">
                 <span
                   className="text-green-400 text-lg font-bold cursor-pointer"
                   onClick={handleOpenCreateModal}
                 >
                   Add Recipe
                 </span>
+
+                {/* Copy to Clipboard Button */}
+                <button
+                  onClick={handleCopyToClipboard}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-300 text-white font-medium rounded-lg shadow hover:bg-green-600 transition"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="size-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184"
+                    />
+                  </svg>
+                  <span className="text-sm">Copy</span>
+                </button>
               </div>
             </div>
 
+            {/* Add Recipe Modal */}
             <CreateRecipeModal setOpen={setModalOpen} open={modalOpen} />
-
-            <div className="my-4 grid lg:grid-cols-4 sm:grid-cols-2 p-4 gap-y-6 gap-x-4">
+            <div className="my-4 flex justify-start gap-6 overflow-x-auto pb-4">
               {filteredRecipes?.map((recipe, index) => {
                 return (
                   <div
                     key={index}
-                    className="flex-col justify-items-center items-center align-middle px-5 py-2 rounded-xl text-black font-bold w-fit h-auto cursor-pointer"
+                    className="px-5 py-2 rounded-xl text-black font-bold cursor-pointer min-w-[200px] max-w-[240px] flex-shrink-0"
                     onClick={() => {
                       setViewRecipe(true);
                       setSelectedRecipe(recipe);
@@ -210,9 +238,9 @@ function App() {
                     <img
                       src={recipe.imageUrl}
                       alt="Recipe Photo"
-                      className="rounded-lg"
+                      className="rounded-lg w-full h-40 object-cover"
                     />
-                    <p className="ml-2 text-md text-center italic font-semibold w-auto h-1/2">
+                    <p className="ml-2 text-md text-center italic font-semibold">
                       {recipe.name}
                     </p>
                   </div>

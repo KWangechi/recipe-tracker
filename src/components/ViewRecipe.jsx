@@ -1,17 +1,35 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import CreateRecipeModal from "./CreateRecipeModal";
-import DeleteConfirmationModal from "./DeleteConfirmationModal";
+import { deleteRecipe } from "../store/useRecipeStore";
 
 export default function ViewRecipe({ selectedRecipe, setViewRecipe }) {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [viewMoreModalOpen, setViewMoreModalOpen] = useState(false);
+  const [dragging, setDragging] = useState(false);
+
+  const handleDragStart = () => {
+    setDragging(true);
+  };
+
+  const handleDragEnd = () => {
+    setDragging(false);
+  };
+
+  const handleViewMore = () => {
+    setViewMoreModalOpen(true);
+  };
 
   const handleEditRecipe = () => {
     setEditModalOpen(true);
   };
 
   const handleDeleteRecipe = () => {
-    setDeleteModalOpen(true);
+    deleteRecipe(selectedRecipe?.id);
+    alert("Success");
+    setDeleteModalOpen(false);
+    setViewRecipe(false);
   };
 
   const handleBack = () => {
@@ -24,19 +42,19 @@ export default function ViewRecipe({ selectedRecipe, setViewRecipe }) {
     window.print();
   };
 
-  const handleCopyToClipboard = () => {
-    // navigator.clipboard.writeText(selectedRecipe?.instructions);
-    // alert("Instructions copied to clipboard!");
-  };
-
   return (
-    <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg overflow-hidden lg:max-w-4xl mt-6 relative">
+    <div
+      className="max-w-md mx-auto bg-white rounded-xl shadow-lg overflow-hidden lg:max-w-4xl mt-6 relative cursor-move"
+      draggable
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
       {/* Image Section */}
       <div className="flex justify-center mt-4">
         <img
           src={selectedRecipe?.imageUrl}
           alt={selectedRecipe?.file?.name || "Recipe Image"}
-          className="h-40 object-fit md:h-54"
+          className="h-40 object-cover md:h-54 w-full rounded-lg"
         />
       </div>
 
@@ -96,7 +114,7 @@ export default function ViewRecipe({ selectedRecipe, setViewRecipe }) {
 
             {/* Delete Button */}
             <button
-              onClick={handleDeleteRecipe}
+              onClick={() => setDeleteModalOpen(true)}
               className="p-2 bg-red-100 rounded-full hover:bg-red-200 transition"
             >
               <svg
@@ -129,10 +147,10 @@ export default function ViewRecipe({ selectedRecipe, setViewRecipe }) {
         <div className="mt-4">
           <h4 className="text-lg font-semibold text-gray-800">Ingredients</h4>
           <ul className="text-sm text-gray-600 mt-2 space-y-1">
-            {typeof selectedRecipe.ingredients == "object" &&
-              selectedRecipe?.ingredients?.map((ingredient, index) => {
-                return <li key={index}>{ingredient}</li>;
-              })}
+            {Array.isArray(selectedRecipe?.ingredients) &&
+              selectedRecipe.ingredients.map((ingredient, index) => (
+                <li key={index}>{ingredient}</li>
+              ))}
           </ul>
         </div>
 
@@ -140,9 +158,17 @@ export default function ViewRecipe({ selectedRecipe, setViewRecipe }) {
         <div className="mt-6">
           <h4 className="font-semibold text-lg">Instructions</h4>
           <ul className="text-sm text-gray-600 mt-2 space-y-2">
-            {selectedRecipe?.instructions?.map((instruction, index) => (
-              <li key={index}>{instruction}</li>
-            )) || <li>No instructions provided.</li>}
+            {Array.isArray(selectedRecipe?.instructions) &&
+              selectedRecipe.instructions
+                .slice(0, 4)
+                .map((instruction, index) => (
+                  <li key={index}>{instruction}</li>
+                ))}
+            {selectedRecipe?.instructions?.length > 4 && (
+              <button onClick={handleViewMore} className="text-indigo-600 mt-2">
+                View More
+              </button>
+            )}
           </ul>
         </div>
 
@@ -174,28 +200,6 @@ export default function ViewRecipe({ selectedRecipe, setViewRecipe }) {
             </svg>
             Print
           </button>
-
-          {/* Copy to Clipboard Button */}
-          <button
-            onClick={handleCopyToClipboard}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-500 text-white font-medium rounded-lg shadow hover:bg-indigo-600 transition"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="size-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184"
-              />
-            </svg>
-            Copy
-          </button>
         </div>
 
         {/* Edit Modal */}
@@ -209,12 +213,62 @@ export default function ViewRecipe({ selectedRecipe, setViewRecipe }) {
 
         {/* Delete Modal */}
         {deleteModalOpen && (
-          <DeleteConfirmationModal
-            setOpen={setDeleteModalOpen}
-            open={deleteModalOpen}
-            recipeToDelete={selectedRecipe}
-          />
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg w-11/12 max-w-lg">
+              <h4 className="text-lg font-semibold mb-4">Delete Recipe</h4>
+              <hr />
+              <p className="text-sm">
+                <span className="text-gray-500">
+                  Are you sure you want to delete this recipe?
+                </span>
+                &nbsp;
+                <span className="font-semibold">
+                  This action cannot be undone!
+                </span>
+              </p>
+              <div className="flex justify-between items-center gap-4 mt-4">
+                <button
+                  onClick={() => setDeleteModalOpen(false)}
+                  className="px-4 py-2 bg-gray-600 text-white rounded-lg"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteRecipe}
+                  className="px-4 py-2 bg-red-500 text-white rounded-lg"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
         )}
+
+        {/* View More Modal for Instructions */}
+        {viewMoreModalOpen &&
+          createPortal(
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white p-6 rounded-lg w-11/12 max-w-lg">
+                <h4 className="text-lg font-semibold mb-4">
+                  Full Instructions
+                </h4>
+                <ul className="space-y-2">
+                  {selectedRecipe?.instructions?.map((instruction, index) => (
+                    <li key={index}>{instruction}</li>
+                  ))}
+                </ul>
+                <div className="mt-4 text-right">
+                  <button
+                    onClick={() => setViewMoreModalOpen(false)}
+                    className="px-4 py-2 bg-gray-600 text-white rounded-lg"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>,
+            document.body
+          )}
       </div>
     </div>
   );
