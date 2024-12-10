@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import CreateRecipeModal from "./components/CreateRecipeModal";
 import {
-  featuredRecipe,
   fetchAllRecipes,
   filterRecipes,
   recipeCategories,
   searchRecipes,
 } from "./store/useRecipeStore";
 import ViewRecipe from "./components/ViewRecipe";
+import { DarkModeButton } from "./components/DarkModeButton";
 
 function App() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -16,6 +16,7 @@ function App() {
   const [filteredRecipes, setFilteredRecipes] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState();
   const [viewRecipe, setViewRecipe] = useState(false);
+  const [featuredRecipe, setFeaturedRecipe] = useState({});
   const [selectedRecipe, setSelectedRecipe] = useState({});
 
   const handleCopyToClipboard = () => {
@@ -38,6 +39,14 @@ function App() {
     }
   }, [viewRecipe]);
 
+  useMemo(() => {
+    // Fetch featured recipe when the component is mounted
+    const allRecipes = fetchAllRecipes();
+    setFeaturedRecipe(
+      allRecipes?.[Math.floor(Math.random() * allRecipes?.length)] || {}
+    );
+  }, []);
+
   // Filter recipes based on the search term
   useEffect(() => {
     setFilteredRecipes(searchRecipes(searchTerm));
@@ -57,16 +66,20 @@ function App() {
           setViewRecipe={setViewRecipe}
         />
       ) : (
-        <div className="rounded-lg my-5 mx-auto text-black p-8 shadow-lg max-w-screen-lg">
+        <div className="rounded-lg my-5 mx-auto text-black p-8 shadow-lg max-w-screen-lg dark:bg-gray-800 dark:text-gray-300">
           {/* Title Section */}
-          <div className="flex justify-center">
+          <div className="flex justify-between items-center">
             <h1 className="text-2xl text-center font-bold">
               What would you like to cook today?
             </h1>
+
+            <div className="flex justify-end">
+              <DarkModeButton />
+            </div>
           </div>
 
           {/* Search Input Section */}
-          <div className="flex items-center rounded-md bg-white pl-3 outline outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 mt-5">
+          <div className="flex items-center rounded-md mt-4 bg-white pl-3 outline outline-1 -outline-offset-1 outline-gray-300 has-[input:focus-within]:outline has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-green-400">
             <div className="shrink-0 select-none text-base text-gray-500 sm:text-sm">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -90,11 +103,11 @@ function App() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search for recipes"
-              className="block min-w-0 grow pl-1 pr-3 text-base text-gray-900 placeholder:text-gray-400 focus:outline-0 sm:text-sm rounded-xl py-2"
+              className="dark:bg-gray-800 block min-w-0 grow py-1.5 pl-1 pr-3 text-base text-gray-900 placeholder:text-gray-400 focus:outline focus:outline-0 sm:text-sm/6"
             />
             {searchTerm && (
               <div
-                className="grid shrink-0 grid-cols-1 focus-within:relative mr-4 cursor-pointer"
+                className="grid shrink-0 grid-cols-1 mr-4 cursor-pointer"
                 onClick={clearSearch}
               >
                 <svg
