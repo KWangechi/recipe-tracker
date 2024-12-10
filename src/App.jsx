@@ -50,7 +50,7 @@ function App() {
           setViewRecipe={setViewRecipe}
         />
       ) : (
-        <div className="rounded-lg w-1/2 my-5 mx-auto text-black p-8 shadow-lg">
+        <div className="rounded-lg w-1/2 my-5 mx-auto text-black p-8 shadow-lg sm:w-full">
           <div className="flex justify-between">
             <h1 className="text-2xl text-center font-bold text-wrap">
               What would you like to cook today?

@@ -28,8 +28,6 @@ export default function CreateRecipeModal({ open, setOpen, selectedRecipe }) {
   const handlePhotoUploaded = async (e) => {
     const file = e.target.files[0];
     let imageUrl = "";
-
-    console.log(file);
     if (file) {
       imageUrl = await processImageUploaded(file);
       setPhotoUrl(imageUrl);

@@ -129,9 +129,10 @@ export default function ViewRecipe({ selectedRecipe, setViewRecipe }) {
         <div className="mt-4">
           <h4 className="text-lg font-semibold text-gray-800">Ingredients</h4>
           <ul className="text-sm text-gray-600 mt-2 space-y-1">
-            {selectedRecipe?.ingredients?.map((ingredient, index) => {
-              return <li key={index}>{ingredient}</li>;
-            })}
+            {typeof selectedRecipe.ingredients == "object" &&
+              selectedRecipe?.ingredients?.map((ingredient, index) => {
+                return <li key={index}>{ingredient}</li>;
+              })}
           </ul>
         </div>
 
