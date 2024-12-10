@@ -140,7 +140,7 @@ export function deleteRecipe(recipeId) {
 
   let index = recipes.findIndex((recipe) => recipe?.id === recipeId);
 
-  if (index > 0) {
+  if (index >= 0) {
     recipes.splice(index, 1);
     console.log(recipes);
     localStorage.setItem("recipes", JSON.stringify([...recipes]));
