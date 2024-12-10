@@ -160,20 +160,20 @@ function App() {
                 return (
                   <div
                     key={index}
-                    className={`flex items-center px-4 py-3 rounded-xl shadow-2xl font-bold cursor-pointer
+                    className={`flex items-center align-middle px-4 py-2 rounded-lg shadow-2xl font-bold cursor-pointer mb-4
             ${
               selectedCategory === category.name
                 ? "bg-green-600 text-white"
-                : "bg-white text-black"
+                : "bg-gray-200 text-black"
             }`}
                     onClick={() => setSelectedCategory(category.name)}
                   >
-                    <img
+                    {/* <img
                       src={category.icon}
                       alt={category.label}
                       width="20px"
                       height="20px"
-                    />
+                    /> */}
                     <span className="ml-2 text-md text-center">
                       {category.label}
                     </span>
