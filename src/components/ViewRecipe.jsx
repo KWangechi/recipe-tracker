@@ -208,6 +208,7 @@ export default function ViewRecipe({ selectedRecipe, setViewRecipe }) {
             open={editModalOpen}
             setOpen={setEditModalOpen}
             selectedRecipe={selectedRecipe}
+            setViewRecipe={setViewRecipe}
           />
         )}
 

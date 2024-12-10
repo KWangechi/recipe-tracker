@@ -134,10 +134,13 @@ function App() {
                 </p>
               </div>
               <div className="mt-4 flex justify-center">
-                <button className="bg-yellow-400 text-black px-6 py-2 font-bold rounded-full shadow-md hover:bg-yellow-300 focus:ring-2 focus:ring-yellow-500" onClick={() => {
-                  setSelectedRecipe(featuredRecipe)
-                  setViewRecipe(true)
-                }}>
+                <button
+                  className="bg-yellow-400 text-black px-6 py-2 font-bold rounded-full shadow-md hover:bg-yellow-300 focus:ring-2 focus:ring-yellow-500"
+                  onClick={() => {
+                    setSelectedRecipe(featuredRecipe);
+                    setViewRecipe(true);
+                  }}
+                >
                   View Recipe
                 </button>
               </div>
