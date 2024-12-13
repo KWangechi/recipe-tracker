@@ -10,7 +10,12 @@ import {
   updateRecipe,
 } from "../store/useRecipeStore";
 
-export default function CreateRecipeModal({ open, setOpen, selectedRecipe, setViewRecipe }) {
+export default function CreateRecipeModal({
+  open,
+  setOpen,
+  selectedRecipe,
+  setViewRecipe,
+}) {
   const [photoUrl, setPhotoUrl] = useState(null);
 
   const editMode = !!selectedRecipe;
@@ -52,7 +57,9 @@ export default function CreateRecipeModal({ open, setOpen, selectedRecipe, setVi
 
     setPhotoUrl(null);
     setOpen(false);
-    setViewRecipe(false);
+    if (editMode) {
+      setViewRecipe(false);
+    }
   };
 
   return (

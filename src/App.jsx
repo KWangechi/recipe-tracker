@@ -66,7 +66,7 @@ function App() {
           setViewRecipe={setViewRecipe}
         />
       ) : (
-        <div className="rounded-lg my-5 mx-auto text-black p-8 shadow-lg max-w-screen-lg dark:bg-gray-800 dark:text-gray-300">
+        <div className="rounded-lg my-5 mx-auto p-8 shadow-lg max-w-screen-lg">
           {/* Title Section */}
           <div className="flex justify-between items-center">
             <h1 className="text-2xl text-center font-bold">
@@ -103,7 +103,7 @@ function App() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search for recipes"
-              className="dark:bg-gray-800 block min-w-0 grow py-1.5 pl-1 pr-3 text-base text-gray-900 placeholder:text-gray-400 focus:outline focus:outline-0 sm:text-sm/6"
+              className="block min-w-0 grow py-1.5 pl-1 pr-3 text-base text-gray-900 placeholder:text-gray-400 focus:outline focus:outline-0 sm:text-sm/6"
             />
             {searchTerm && (
               <div
@@ -184,12 +184,12 @@ function App() {
             }`}
                     onClick={() => setSelectedCategory(category.name)}
                   >
-                    {/* <img
+                    <img
                       src={category.icon}
                       alt={category.label}
                       width="20px"
                       height="20px"
-                    /> */}
+                    />
                     <span className="ml-2 text-md text-center">
                       {category.label}
                     </span>
