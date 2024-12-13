@@ -234,27 +234,27 @@ export const recipeCategories = [
   {
     name: "dessert",
     label: "Dessert",
-    icon: "/public/assets/dessert.png",
+    icon: "/assets/dessert.png",
   },
   {
     name: "breakfast",
     label: "Breakfast",
-    icon: "/public/assets/breakfast.png",
+    icon: "/assets/breakfast.png",
   },
   {
     name: "lunch",
     label: "Lunch",
-    icon: "/public/assets/lunch.png",
+    icon: "/assets/lunch.png",
   },
   {
     name: "dinner",
     label: "Dinner",
-    icon: "/public/assets/dinner.png",
+    icon: "/assets/dinner.png",
   },
   {
     name: "snacks",
     label: "Snacks",
-    icon: "/public/assets/snacks.png",
+    icon: "/assets/snacks.png",
   },
 ];
 
