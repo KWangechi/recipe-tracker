@@ -28,6 +28,17 @@ function App() {
     setModalOpen(true);
   }
 
+  function handleSearch(e) {
+    const value = e.target.value;
+    // create a regex such that only numbers and letters are allowed
+    const regex = /^[A-Za-z0-9]+$/;
+    if (!regex.test(value)) {
+      alert("Invalid search term. Please use only letters and numbers");
+      return;
+    }
+    setSearchTerm(value.toString());
+  }
+
   function clearSearch() {
     setSearchTerm("");
   }
@@ -101,7 +112,7 @@ function App() {
               name="search"
               type="text"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearch(e)}
               placeholder="Search for recipes"
               className="block min-w-0 grow py-1.5 pl-1 pr-3 text-base text-gray-900 placeholder:text-gray-400 focus:outline focus:outline-0 sm:text-sm/6"
             />
