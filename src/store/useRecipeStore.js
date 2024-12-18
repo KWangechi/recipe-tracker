@@ -278,12 +278,10 @@ export function processImageUploaded(recipeImage) {
   });
 }
 
-export function searchRecipes(search) {
-  fetchAllRecipes();
-
-  if (recipes?.length) {
+export function searchRecipes(allRecipes, search) {
+  if (allRecipes?.length) {
     const filteredRecipes = search
-      ? recipes?.filter((recipe) => {
+      ? allRecipes?.filter((recipe) => {
           return Object.values(recipe).some(
             (value) =>
               typeof value !== "object" &&
@@ -291,8 +289,8 @@ export function searchRecipes(search) {
           );
         })
       : [...recipes];
-    recipes = [...filteredRecipes];
-    return recipes;
+
+    return filteredRecipes;
   }
 }
 

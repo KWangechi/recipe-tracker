@@ -1,12 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import CreateRecipeModal from "./components/CreateRecipeModal";
-import {
-  fetchAllRecipes,
-  filterRecipes,
-  recipeCategories,
-  searchRecipes,
-} from "./store/useRecipeStore";
+import { fetchAllRecipes, recipeCategories } from "./store/useRecipeStore";
 import ViewRecipe from "./components/ViewRecipe";
 import { DarkModeButton } from "./components/DarkModeButton";
 
@@ -58,15 +53,28 @@ function App() {
     );
   }, []);
 
-  // Filter recipes based on the search term
+  // Fetch recipes from local storage when the component is mounted
   useEffect(() => {
-    setFilteredRecipes(searchRecipes(searchTerm));
-  }, [searchTerm]);
+    const fetchRecipes = async () => {
+      const allRecipes = fetchAllRecipes(); // Assuming fetchAllRecipes() is an async function that fetches recipes from local storage
 
-  // Filter recipes based on the category filter
-  useEffect(() => {
-    setFilteredRecipes(filterRecipes(fetchAllRecipes(), selectedCategory));
-  }, [selectedCategory]);
+      const filteredBySearch = searchTerm
+        ? allRecipes.filter((recipe) =>
+            recipe.name.toLowerCase().includes(searchTerm.toLowerCase())
+          )
+        : allRecipes;
+
+      const filteredByCategory = selectedCategory
+        ? filteredBySearch.filter(
+            (recipe) => recipe.category === selectedCategory
+          )
+        : filteredBySearch;
+
+      setFilteredRecipes(filteredByCategory);
+    };
+
+    fetchRecipes();
+  }, [searchTerm, selectedCategory]);
 
   return (
     <>
@@ -211,70 +219,76 @@ function App() {
           </div>
 
           {/* Recipes Section */}
-          <div className="mt-12">
-            <div className="flex items-center justify-between">
-              <div className="flex justify-start">
-                <span className="font-bold text-xl">Recipes</span>
+          {filteredRecipes.length ? (
+            <div className="mt-12">
+              <div className="flex items-center justify-between">
+                <div className="flex justify-start">
+                  <span className="font-bold text-xl">Recipes</span>
+                </div>
+
+                <div className="flex justify-end gap-4">
+                  <span
+                    className="text-green-400 text-lg font-bold cursor-pointer"
+                    onClick={handleOpenCreateModal}
+                  >
+                    Add Recipe
+                  </span>
+
+                  {/* Copy to Clipboard Button */}
+                  <button
+                    onClick={handleCopyToClipboard}
+                    className="flex items-center gap-2 px-4 py-2 bg-green-300 text-white font-medium rounded-lg shadow hover:bg-green-600 transition"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="size-4"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184"
+                      />
+                    </svg>
+                    <span className="text-sm">Copy</span>
+                  </button>
+                </div>
               </div>
 
-              <div className="flex justify-end gap-4">
-                <span
-                  className="text-green-400 text-lg font-bold cursor-pointer"
-                  onClick={handleOpenCreateModal}
-                >
-                  Add Recipe
-                </span>
-
-                {/* Copy to Clipboard Button */}
-                <button
-                  onClick={handleCopyToClipboard}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-300 text-white font-medium rounded-lg shadow hover:bg-green-600 transition"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-4"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184"
-                    />
-                  </svg>
-                  <span className="text-sm">Copy</span>
-                </button>
+              {/* Add Recipe Modal */}
+              <CreateRecipeModal setOpen={setModalOpen} open={modalOpen} />
+              <div className="my-4 flex justify-start gap-6 overflow-x-auto pb-4">
+                {filteredRecipes?.map((recipe, index) => {
+                  return (
+                    <div
+                      key={index}
+                      className="px-5 py-2 rounded-xl text-black font-bold cursor-pointer min-w-[200px] max-w-[240px] flex-shrink-0"
+                      onClick={() => {
+                        setViewRecipe(true);
+                        setSelectedRecipe(recipe);
+                      }}
+                    >
+                      <img
+                        src={recipe.imageUrl}
+                        alt="Recipe Photo"
+                        className="rounded-lg w-full h-40 object-cover"
+                      />
+                      <p className="ml-2 text-md text-center italic font-semibold">
+                        {recipe.name}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-
-            {/* Add Recipe Modal */}
-            <CreateRecipeModal setOpen={setModalOpen} open={modalOpen} />
-            <div className="my-4 flex justify-start gap-6 overflow-x-auto pb-4">
-              {filteredRecipes?.map((recipe, index) => {
-                return (
-                  <div
-                    key={index}
-                    className="px-5 py-2 rounded-xl text-black font-bold cursor-pointer min-w-[200px] max-w-[240px] flex-shrink-0"
-                    onClick={() => {
-                      setViewRecipe(true);
-                      setSelectedRecipe(recipe);
-                    }}
-                  >
-                    <img
-                      src={recipe.imageUrl}
-                      alt="Recipe Photo"
-                      className="rounded-lg w-full h-40 object-cover"
-                    />
-                    <p className="ml-2 text-md text-center italic font-semibold">
-                      {recipe.name}
-                    </p>
-                  </div>
-                );
-              })}
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-lg font-bold">No recipes found</p>
             </div>
-          </div>
+          )}
         </div>
       )}
     </>
