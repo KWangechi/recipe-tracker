@@ -227,9 +227,6 @@ export let recipes = [];
 export let featuredRecipe =
   recipes?.[Math.floor(Math.random() * recipes?.length)] || {};
 
-let successMessage,
-  errorMessages = "";
-
 export const recipeCategories = [
   {
     name: "dessert",
@@ -320,8 +317,6 @@ export function addRecipe(newRecipe) {
   );
 
   fetchAllRecipes();
-
-  successMessage = "Recipe Added!";
 }
 
 export function fetchAllRecipes() {
@@ -355,7 +350,6 @@ export function updateRecipe(recipeId, updatedRecipe) {
     };
 
     localStorage.setItem("recipes", JSON.stringify(recipes));
-    successMessage = "Recipe Updated!";
     fetchAllRecipes();
   }
 
