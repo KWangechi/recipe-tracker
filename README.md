@@ -23,19 +23,19 @@ The Recipe Tracker Application is a web-based application that helps users store
   ![Recipes List](public/assets/readme_photos/image-1.png)
 
 - Adding a Recipe
-  ![Add Recipe](public/assets/readme_photos/image-2.png)
+  > ![Add Recipe](public/assets/readme_photos/image-2.png)
 
 - View Recipe
-  ![View Recipe](public/assets/readme_photos/image-3.png)
+  > ![View Recipe](public/assets/readme_photos/image-3.png)
 
 - Edit Recipe
-  ![Edit Recipe](public/assets/readme_photos/image-5.png)
+  > ![Edit Recipe](public/assets/readme_photos/image-5.png)
 
 - Delete a Recipe
-  ![Delete Recipe](public/assets/readme_photos/image-4.png)
+  > ![Delete Recipe](public/assets/readme_photos/image-4.png)
 
 - Filter by Category
-  ![Filter By Category](public/assets/readme_photos/image-6.png)
+  > ![Filter By Category](public/assets/readme_photos/image-6.png)
 
 - Search for a Recipe
-  ![Search for a Recipe](public/assets/readme_photos/image-7.png)
+  > ![Search for a Recipe](public/assets/readme_photos/image-7.png)

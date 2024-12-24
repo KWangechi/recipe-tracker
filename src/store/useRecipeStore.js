@@ -227,6 +227,7 @@ export let recipes = [];
 export let featuredRecipe =
   recipes?.[Math.floor(Math.random() * recipes?.length)] || {};
 
+
 export const recipeCategories = [
   {
     name: "dessert",
