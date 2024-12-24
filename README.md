@@ -20,7 +20,7 @@ The Recipe Tracker Application is a web-based application that helps users store
 ### Screenshots of the Application
 
 - Recipes List
-  ![Recipes List](public/assets/readme_photos/image-1.png)
+  > ![Recipes List](public/assets/readme_photos/image-1.png)
 
 - Adding a Recipe
   > ![Add Recipe](public/assets/readme_photos/image-2.png)
